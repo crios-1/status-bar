@@ -1,6 +1,6 @@
 # status-bar
 
-**A Linux-style status bar for the top of your Windows 11 screen.** It shows live CPU, memory and disk use, and keeps an eye on your Claude Code sessions. It's a single PowerShell script with nothing to install.
+**A status bar for Windows 11.** It shows live CPU, memory and disk use, and keeps an eye on your Claude Code sessions. It's a single PowerShell script with nothing to install.
 
 ![Status bar - left side](docs/bar-left.png)
 ![Status bar - right side](docs/bar-right.png)
@@ -11,7 +11,7 @@
 
 ## What it does
 
-- **Docks to the top of your screen** like Ubuntu's top bar. Windows reserves the space for it, so maximized windows fit underneath instead of covering it.
+- **Docks to the top of your screen.** Windows reserves the space for it, so maximized windows fit underneath instead of covering it.
 - **CPU:** live usage % with a mini bar that turns amber at 70% and red at 90%.
 - **RAM:** used/total memory and %. **Click it** for a breakdown of where your memory goes.
 - **DISK:** how busy your disks are, with live read/write speed.
