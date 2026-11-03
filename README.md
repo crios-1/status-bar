@@ -11,6 +11,7 @@ Live CPU, memory, disk and Claude Code sessions, always on top of your screen.
 ![PowerShell 5.1](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
 ![No install](https://img.shields.io/badge/install-none-4CB782)
 ![One script](https://img.shields.io/badge/files-1%20script-8899AA)
+![MIT license](https://img.shields.io/badge/license-MIT-E6EAF0)
 ![Built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-D97757?logo=anthropic&logoColor=white)
 
 [Why?](#-why) · [Features](#-features) · [Get started](#-get-started-1-minute) · [FAQ](#-faq) · [How it works](#%EF%B8%8F-how-it-works)
@@ -129,6 +130,12 @@ Right-click → **Close SysBar**, then delete the shortcut from `shell:startup` 
 | `SysBar.ps1` | The status bar |
 | `Start-SysBar.bat` | Double-click launcher (optional monitor number) |
 | `SysWidget.ps1` · `Start-SysWidget.bat` | The floating-widget alternative |
+
+---
+
+## 📄 License
+
+[MIT](LICENSE): use it, change it, share it. Just keep the copyright notice.
 
 ---
 
