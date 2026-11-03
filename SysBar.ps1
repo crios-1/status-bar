@@ -349,6 +349,21 @@ if ($SelfTest) {
         $fs = [IO.File]::Create($env:SYSBAR_PREVIEW); $enc.Save($fs); $fs.Close()
     }
     Show-ClaudeSessions; $aiPopup.IsOpen = $false
+    if ($env:SYSBAR_POPUPS) {    # render both popups to PNGs (session names replaced by demo titles)
+        $demo = 'Refactor billing API', 'Fix flaky login test', 'Write release notes', 'Investigate slow query', 'Update dependencies'
+        $i = 0
+        foreach ($row in $aiPopupBody.Children) {
+            if ($row -is [Windows.Controls.DockPanel]) { $t = $row.Children[1]; $t.Text = ('{0,-40}' -f $demo[$i % $demo.Count]) + $t.Text.Substring(40) -replace '(ADMIN)?JRAU', 'me'; $i++ }
+        }
+        Show-MemoryBreakdown; $memPopup.IsOpen = $false
+        foreach ($p in @(@{ n = 'popup-memory'; c = $memPopup.Child }, @{ n = 'popup-claude'; c = $aiPopup.Child })) {
+            $p.c.Margin = '0'; $p.c.Measure([Windows.Size]::new([double]::PositiveInfinity, [double]::PositiveInfinity)); $p.c.Arrange([Windows.Rect]::new($p.c.DesiredSize))
+            $bmp = New-Object Windows.Media.Imaging.RenderTargetBitmap ([int]$p.c.ActualWidth * 2), ([int]$p.c.ActualHeight * 2), 192, 192, ([Windows.Media.PixelFormats]::Pbgra32)
+            $bmp.Render($p.c)
+            $enc = New-Object Windows.Media.Imaging.PngBitmapEncoder; $enc.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create($bmp))
+            $fs = [IO.File]::Create((Join-Path $env:SYSBAR_POPUPS "$($p.n).png")); $enc.Save($fs); $fs.Close()
+        }
+    }
     "BAR: CLAUDE $($aiItem.Value.Text)"
     $aiPopupBody.Children | ForEach-Object { if ($_ -is [Windows.Controls.DockPanel]) { $_.Children[1].Text + '  [x]' } else { $_.Text } }
     [System.Windows.Forms.Screen]::AllScreens | ForEach-Object { "Screen: $($_.DeviceName) $($_.Bounds) primary=$($_.Primary)" }
