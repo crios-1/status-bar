@@ -3,6 +3,14 @@
 # -Monitor <n> picks the screen (0 = primary). Right-click the bar to close.
 param([int]$Monitor = 0, [int]$IntervalMs = 1500, [int]$HeightDip = 26, [switch]$SelfTest)
 
+# Only one bar per monitor: a second start (shortcut + scheduled task, double-click) exits quietly
+$script:mutex = New-Object System.Threading.Mutex($false, "Local\SysBar-Monitor$Monitor")
+if (-not $SelfTest -and -not $script:mutex.WaitOne(0)) { return }
+
+# Errors at startup are otherwise invisible (hidden window), so keep a small log
+$logFile = Join-Path $env:LOCALAPPDATA 'SysBar\sysbar.log'
+trap { try { "$(Get-Date -Format s)  $($_.Exception.Message)  @ $($_.InvocationInfo.PositionMessage)" | Add-Content $logFile } catch {}; break }
+
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase, System.Windows.Forms
 
 Add-Type @"
