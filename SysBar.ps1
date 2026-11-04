@@ -1,4 +1,4 @@
-# SysBar - Ubuntu-style status bar docked to the top of a monitor (CPU / RAM / disk / clock).
+# SysBar - status bar docked to the top of a monitor (CPU / RAM / disk / drives / Claude sessions).
 # Registers as a Windows "AppBar" so maximized windows leave room for it.
 # -Monitor <n> picks the screen (0 = primary). Right-click the bar to close.
 param([int]$Monitor = 0, [int]$IntervalMs = 1500, [int]$HeightDip = 26, [switch]$SelfTest)
@@ -310,7 +310,7 @@ $aiItem.Panel.Add_MouseLeftButtonUp({
 
 function Update-Stats {
     try {
-        $clock.Text = (Get-Date).ToString('ddd d MMM  HH:mm')
+        $clock.Text = ''   # centre slot is only used for error messages (Windows already shows the time)
 
         $cpu = (Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor -Filter "Name='_Total'").PercentProcessorTime
         Set-Bar $cpuItem $cpu
@@ -339,7 +339,7 @@ function Update-Stats {
 
 Update-Stats
 if ($SelfTest) {
-    "$($clock.Text) | CPU $($cpuItem.Value.Text) | RAM $($memItem.Value.Text) | DISK $($diskItem.Value.Text)"
+    "CPU $($cpuItem.Value.Text) | RAM $($memItem.Value.Text) | DISK $($diskItem.Value.Text)"
     $driveItems.Keys | ForEach-Object { "$_ $($driveItems[$_].Value.Text)" }
     if ($env:SYSBAR_PREVIEW) {   # render the bar to a PNG for a visual check
         $win.Width = 1600; $win.Show(); $win.UpdateLayout()

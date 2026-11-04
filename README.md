@@ -54,7 +54,6 @@ In short: **keep the machine in check while you drive it.** 🏁
 | 🐏 **RAM** | Used / total memory. **Click** for a breakdown of where it all went |
 | 💽 **DISK** | How busy your disks are, plus live read/write speed |
 | 🗄️ **Drives** | Free space per drive |
-| 🕐 **Clock** | Date and time in the middle, like any good dashboard |
 | 🤖 **CLAUDE** | Running Claude Code sessions: busy vs idle. **Click** for details and ✕ to end one |
 | 🔔 **"Ready for you"** | A small pop-up and a chime the moment a Claude session finishes its work |
 | 🪶 **Lightweight** | One PowerShell script, refreshes every 1.5 s, nothing to install |
