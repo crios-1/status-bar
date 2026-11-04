@@ -371,15 +371,32 @@ if ($SelfTest) {
 }
 
 # Pick the target screen: primary first, then the others in Windows' order
-$screens = @([System.Windows.Forms.Screen]::AllScreens | Sort-Object { -not $_.Primary })
-$screen  = $screens[[math]::Min($Monitor, $screens.Count - 1)]
 $script:hwnd = [IntPtr]::Zero
+$script:dockedFor = ''
+
+function Get-TargetScreen {
+    $screens = @([System.Windows.Forms.Screen]::AllScreens | Sort-Object { -not $_.Primary })
+    $screens[[math]::Min($Monitor, $screens.Count - 1)]
+}
 
 function Dock-Bar([bool]$isNew) {
+    $screen = Get-TargetScreen
     $scale = [Windows.Media.VisualTreeHelper]::GetDpi($win).DpiScaleY
     $b = $screen.Bounds
     [AppBar]::Dock($script:hwnd, $b.Left, $b.Top, $b.Right, [int][math]::Ceiling($HeightDip * $scale), $isNew)
+    $script:dockedFor = "$($b)|$scale"
 }
+
+# Re-dock when monitors, resolution or scaling change (docking/undocking the laptop, etc.)
+function Test-Dock {
+    if ($script:hwnd -eq [IntPtr]::Zero) { return }
+    $scale = [Windows.Media.VisualTreeHelper]::GetDpi($win).DpiScaleY
+    $b = (Get-TargetScreen).Bounds
+    $widthOff = [math]::Abs($win.ActualWidth * $scale - $b.Width) -gt 2
+    if ($widthOff -or "$($b)|$scale" -ne $script:dockedFor) { Dock-Bar $false }
+}
+[Microsoft.Win32.SystemEvents]::add_DisplaySettingsChanged({ $win.Dispatcher.BeginInvoke([action]{ Dock-Bar $false }) })
+$win.Add_DpiChanged({ $win.Dispatcher.BeginInvoke([action]{ Dock-Bar $false }) })
 
 $win.Add_SourceInitialized({
     $script:hwnd = (New-Object Windows.Interop.WindowInteropHelper $win).Handle
@@ -406,7 +423,7 @@ $win.ContextMenu = $menu
 
 $timer = New-Object Windows.Threading.DispatcherTimer
 $timer.Interval = [TimeSpan]::FromMilliseconds($IntervalMs)
-$timer.Add_Tick({ Update-Stats; try { [void](Update-ClaudeItem) } catch {} })
+$timer.Add_Tick({ Update-Stats; try { Test-Dock } catch {}; try { [void](Update-ClaudeItem) } catch {} })
 $timer.Start()
 [void]$win.ShowDialog()
 
