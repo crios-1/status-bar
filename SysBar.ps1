@@ -8,8 +8,9 @@ $script:mutex = New-Object System.Threading.Mutex($false, "Local\SysBar-Monitor$
 if (-not $SelfTest -and -not $script:mutex.WaitOne(0)) { return }
 
 # Errors at startup are otherwise invisible (hidden window), so keep a small log
-$logFile = Join-Path $env:LOCALAPPDATA 'SysBar\sysbar.log'
-trap { try { "$(Get-Date -Format s)  $($_.Exception.Message)  @ $($_.InvocationInfo.PositionMessage)" | Add-Content $logFile } catch {}; break }
+$logFile = Join-Path $PSScriptRoot 'sysbar.log'
+try { "$(Get-Date -Format s)  started (pid $PID, monitor $Monitor)" | Add-Content $logFile -ErrorAction Stop } catch {}
+trap { try { "$(Get-Date -Format s)  $($_.Exception.Message)  @ $($_.InvocationInfo.PositionMessage)" | Add-Content $logFile -ErrorAction Stop } catch {}; break }
 
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase, System.Windows.Forms
 
@@ -403,7 +404,6 @@ function Test-Dock {
     $widthOff = [math]::Abs($win.ActualWidth * $scale - $b.Width) -gt 2
     if ($widthOff -or "$($b)|$scale" -ne $script:dockedFor) { Dock-Bar $false }
 }
-[Microsoft.Win32.SystemEvents]::add_DisplaySettingsChanged({ $win.Dispatcher.BeginInvoke([action]{ Dock-Bar $false }) })
 $win.Add_DpiChanged({ $win.Dispatcher.BeginInvoke([action]{ Dock-Bar $false }) })
 
 $win.Add_SourceInitialized({
