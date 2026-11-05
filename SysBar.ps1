@@ -232,8 +232,11 @@ function Show-Toast([string]$title, [string]$text) {
     [void]$script:toastBody.Children.Add((New-Object Windows.Controls.TextBlock -Property @{ Text = $text; Foreground = $conv.ConvertFrom('#8899AA'); FontFamily = 'Segoe UI'; FontSize = 11; Margin = '0,0,0,4' }))
     $script:toastWin.Show()
     $script:toastWin.UpdateLayout()
-    $script:toastWin.Left = $win.Left + $win.ActualWidth - $script:toastWin.ActualWidth - 12
-    $script:toastWin.Top  = $win.Top + $win.ActualHeight + 12
+    # Bottom centre of the bar's screen, just above the taskbar (WorkingArea is in physical pixels)
+    $scale = [Windows.Media.VisualTreeHelper]::GetDpi($win).DpiScaleX
+    $wa = (Get-TargetScreen).WorkingArea
+    $script:toastWin.Left = ($wa.Left + $wa.Width / 2) / $scale - $script:toastWin.ActualWidth / 2
+    $script:toastWin.Top  = $wa.Bottom / $scale - $script:toastWin.ActualHeight - 16
     $script:toastTimer.Stop(); $script:toastTimer.Start()
     try { [System.Media.SystemSounds]::Asterisk.Play() } catch {}
 }
